@@ -72,18 +72,25 @@ class Classifier(nn.Module):
         )
 
         self.dropout_emb = nn.Dropout(p=self.dropout_rate)  # 嵌入层的 Dropout
-        # 如果是双向 LSTM，hidden_size 需要乘以 2
-        # 因为双向 LSTM 会输出两个隐藏状态，一个正向一个反向，拼接在一起
         self.attention = AttentionLayer(self.hidden_size * 2 if direction == 'bidirectional' else self.hidden_size)  # 注意力层
         self.cls_fc = nn.Linear(in_features=self.hidden_size*2 if direction == 'bidirectional' else self.hidden_size, out_features=self.n_classes) # 分类全连接层
 
-    def forward(self, inputs):
+    def forward(self, inputs, input_lengths):
+        """
+        前向传播
+        :param inputs: 输入张量，形状为 [batch_size, seq_len]
+        :param input_lengths: 每个序列的实际长度，形状为 [batch_size]
+        :return: 分类 logits，形状为 [batch_size, n_classes]
+        """
         batch_size = inputs.shape[0]
         embedded_input = self.embedding(inputs)
         if self.dropout_rate > 0.:
             embedded_input = self.dropout_emb(embedded_input)
 
-        last_layers_hiddens, (last_step_hiddens, last_step_cells) = self.lstm(embedded_input)  # [batch_size, seq_len, hidden_size*2] or [batch_size, seq_len, hidden_size]
+        # 使用 pack_padded_sequence 处理填充
+        packed_input = nn.utils.rnn.pack_padded_sequence(embedded_input, input_lengths, batch_first=True, enforce_sorted=False)
+        packed_output, (last_step_hiddens, last_step_cells) = self.lstm(packed_input)
+        last_layers_hiddens, _ = nn.utils.rnn.pad_packed_sequence(packed_output, batch_first=True)  # 解包
 
         attn_vectors = self.attention(last_layers_hiddens)
 

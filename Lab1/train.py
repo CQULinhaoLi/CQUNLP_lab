@@ -54,12 +54,12 @@ def evaluate(model):
     metric = Metric(id2label)
 
     # Iterate over the test set in batches
-    for batch_texts, batch_labels, _ in split_data_set(test_set, batch_size, max_seq_len, shuffle=False, pad_id=word_dict["[pad]"]):
+    for batch_texts, batch_labels, batch_lengths in split_data_set(test_set, batch_size, max_seq_len, shuffle=False, pad_id=word_dict["[pad]"]):
         batch_texts = batch_texts.to(device)
         batch_labels = batch_labels.to(device).squeeze()
 
         with torch.no_grad():  # Disable gradient computation for evaluation
-            logits = model(batch_texts)
+            logits = model(batch_texts, batch_lengths)
             _, pred_labels = torch.max(logits, dim=1)  # Get predicted labels
 
         # Update the metric with real and predicted labels
@@ -82,12 +82,12 @@ def train(model):
 
     for epoch in range(n_epochs):
         model.train()   # Ensure the model is in training mode
-        for step, (batch_texts, batch_labels, _) in enumerate(split_data_set(train_set, batch_size, max_seq_len, shuffle=True, pad_id=word_dict["[pad]"])):
+        for step, (batch_texts, batch_labels, batch_lengths) in enumerate(split_data_set(train_set, batch_size, max_seq_len, shuffle=True, pad_id=word_dict["[pad]"])):
             batch_texts = batch_texts.to(device)
             batch_labels = batch_labels.to(device).squeeze()
 
             optimizer.zero_grad()  # Clear gradients from the previous step
-            logits = model(batch_texts)  # Forward pass
+            logits = model(batch_texts, batch_lengths)  # Forward pass
             _, pred_labels = torch.max(logits, dim=1)  # Get predicted labels
 
             # Compute the cross-entropy loss
@@ -182,4 +182,4 @@ if __name__ == '__main__':
     # Start training
     train(classifier)
     show_loss_records()  # Show the loss records after training
-    save_model(classifier, optimizer, './model/', model_name='BilLSTM+AddictiveAttention')  # Save the trained model and optimizer state
+    save_model(classifier, optimizer, './model/', model_name='BilLSTM+MaskedAddictiveAttention')  # Save the trained model and optimizer state
