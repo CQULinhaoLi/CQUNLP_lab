@@ -146,16 +146,16 @@ if __name__ == '__main__':
     id2label = dict([(item[1], item[0]) for item in label_dict.items()])  # Map label IDs to label names
 
     # Hyperparameters
-    n_epochs = 3
+    n_epochs = 15
     vocab_size = len(word_dict.keys())
-    batch_size = 128
+    batch_size = 256
     hidden_size = 128
     embedding_size = 128
     n_classes = len(label_dict.keys())
     max_seq_len = 32
     n_layers = 1
     dropout_rate = 0.2
-    learning_rate = 0.0001
+    learning_rate = 0.001
     direction = 'bidirectional'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use GPU if available
     print(f"Device: {device}")
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(
         classifier.parameters(),
         lr=learning_rate,
-        betas=(0.9, 0.999),
+        betas=(0.9, 0.99),
         weight_decay=1e-5
     )
 
