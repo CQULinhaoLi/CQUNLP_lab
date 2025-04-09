@@ -99,7 +99,7 @@ class Classifier(nn.Module):
         self.embedding = nn.Embedding(
             num_embeddings=self.vocab_size,  # 词汇表大小
             embedding_dim=self.embedding_size,  # 嵌入维度
-            weight=nn.Parameter(torch.empty(self.vocab_size, self.embedding_size).uniform_(-self.init_scale, self.init_scale))  # 嵌入权重
+            _weight=nn.Parameter(torch.empty(self.vocab_size, self.embedding_size).uniform_(-self.init_scale, self.init_scale))  # 嵌入权重
         )
 
         self.lstm = nn.LSTM(
