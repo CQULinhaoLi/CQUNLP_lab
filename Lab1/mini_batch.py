@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import torch
+
 def split_data_set(data_set, batch_size, max_seq_len, shuffle=True, drop_last=True, pad_id=1):
     """
     Splits the dataset into mini-batches.
@@ -13,7 +15,8 @@ def split_data_set(data_set, batch_size, max_seq_len, shuffle=True, drop_last=Tr
         pad_id (int): The padding ID to use for sequences shorter than max_seq_len. Default is 1.
 
     Returns:
-        list of lists: A list of mini-batches, where each mini-batch is a list of padded sequences.
+        generator: A generator that yields mini-batches as PyTorch tensors.
+                  Each batch contains (batch_text, batch_label, text_lengths).
     """
     if shuffle:
         # Shuffle the dataset to randomize the order of sequences
@@ -21,8 +24,13 @@ def split_data_set(data_set, batch_size, max_seq_len, shuffle=True, drop_last=Tr
     
     batch_text = []  # Temporary list to store sequences for the current batch
     batch_label = []  # Temporary list to store labels for the current batch
+    batch_lengths = []  # Temporary list to store actual lengths of sequences
 
     for text, label in data_set:
+        # Store the actual length of the sequence before padding/truncation
+        actual_length = min(len(text), max_seq_len)
+        batch_lengths.append(actual_length)
+
         # Pad the sequence to max_seq_len with pad_id if it's shorter
         if len(text) < max_seq_len:
             text += [pad_id] * (max_seq_len - len(text))  # Add padding tokens
@@ -36,14 +44,24 @@ def split_data_set(data_set, batch_size, max_seq_len, shuffle=True, drop_last=Tr
         batch_text.append(text)
         batch_label.append([label])
 
-        # If the batch is full, yield it as a NumPy array and clear the batch lists
+        # If the batch is full, yield it as a PyTorch tensor and clear the batch lists
         if len(batch_text) == batch_size:
-            yield np.array(batch_text).astype("int64"), np.array(batch_label).astype("int64")
+            yield (
+                torch.tensor(batch_text, dtype=torch.long),
+                torch.tensor(batch_label, dtype=torch.long),
+                torch.tensor(batch_lengths, dtype=torch.long)
+            )
             batch_text.clear()
             batch_label.clear()
+            batch_lengths.clear()
 
     # If drop_last is False and there are leftover sequences, yield them as the last batch
     if (not drop_last) and len(batch_label) > 0:
-        yield np.array(batch_text).astype("int64"), np.array(batch_label).astype("int64")
+        yield (
+            torch.tensor(batch_text, dtype=torch.long),
+            torch.tensor(batch_label, dtype=torch.long),
+            torch.tensor(batch_lengths, dtype=torch.long)
+        )
         batch_text.clear()
         batch_label.clear()
+        batch_lengths.clear()

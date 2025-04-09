@@ -4,14 +4,13 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
-import torcch.nn.functional as F
+import torch.nn.functional as F
 import torch.nn.init as I
 import torch.optim as optim
 import matplotlib.pyplot as plt
 
 
 def load_dataset(path):
-    
     # 读取数据集
     train_path = os.path.join(path, 'train.txt')
     test_path = os.path.join(path, 'test.txt')
@@ -21,7 +20,7 @@ def load_dataset(path):
     # 加载词典
     with open(dict_path, 'r', encoding='utf-8') as f:
         # 读取词典文件并生成词典字典，字典中键为单词，值为对应单词在词典中的索引
-        words = [words.strip() for word in f.readlines()]
+        words = [word.strip() for word in f.readlines()]
         word_dict = dict(zip(words, range(len(words))))
 
     # 加载标签词典
