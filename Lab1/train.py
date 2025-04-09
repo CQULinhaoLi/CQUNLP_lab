@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from data_loader import load_dataset
 from tokenizer import convert_corpus_to_id
 from mini_batch import split_data_set
-from model import BiLSTMAttentionModel
+from model import Classifier
 
 def train_model(model, train_data, test_data, word_dict,
                 label_dict, batch_size=32, max_seq_len=100,
@@ -29,7 +29,7 @@ def train_model(model, train_data, test_data, word_dict,
             labels = labels.squeeze()
             print(labels)
             optimizer.zero_grad()  # Clear the gradients from the previous step
-            outputs = model(inputs, text_lengths)  # Forward pass through the model with text_lengths
+            outputs = model(inputs)  # Forward pass through the model with text_lengths
             loss = criterion(outputs, labels)  # Compute the loss
             loss.backward()  # Backward pass to compute gradients
             optimizer.step()  # Update model parameters
@@ -39,9 +39,9 @@ def train_model(model, train_data, test_data, word_dict,
         # Print the loss for the current epoch
         print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss:.4f}")
 
-        # Save the model for the current epoch in the 'model' folder
-        torch.save(model.state_dict(), f'model/model_epoch_{epoch + 1}.pth')
-        print(f"Model saved for epoch {epoch + 1} in the 'model' folder")
+        # # Save the model for the current epoch in the 'model' folder
+        # torch.save(model.state_dict(), f'model/model_epoch_{epoch + 1}.pth')
+        # print(f"Model saved for epoch {epoch + 1} in the 'model' folder")
 
         # Evaluate the model on the test data
         model.eval()  # Set the model to evaluation mode
@@ -53,7 +53,7 @@ def train_model(model, train_data, test_data, word_dict,
                 inputs, labels, text_lengths = batch  # Unpack the batch into inputs, labels, and text lengths
                 inputs, labels = inputs.to(device), labels.to(device)  # Move data to the selected device
 
-                outputs = model(inputs, text_lengths)  # Forward pass through the model with text_lengths
+                outputs = model(inputs)  # Forward pass through the model with text_lengths
                 _, predicted = torch.max(outputs, 1)  # Get the predicted class
                 total += labels.size(0)  # Update the total number of samples
                 correct += (predicted == labels).sum().item()  # Update the count of correct predictions
@@ -80,7 +80,14 @@ if __name__ == '__main__':
     pad_idx = word_dict["[pad]"]  # Padding index
 
     # Initialize the model
-    model = BiLSTMAttentionModel(vocab_size, embedding_dim, hidden_dim, output_dim, pad_idx)
+    model = Classifier(
+        hidden_size=hidden_dim,
+        embedding_size=embedding_dim,
+        vocab_size=vocab_size,
+        n_classes=14,
+        n_layers=1,
+        dropout_rate=0.5
+    )
 
     # Train the model
     train_model(model, train_data, test_data, word_dict,
