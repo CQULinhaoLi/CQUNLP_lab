@@ -1,13 +1,18 @@
 import torch
 import jieba
-from data_loader import load_dataset
+from data_loader import load_dict
 from model import Classifier
 
-def load_model(model, model_path, model_name):
-    full_model_path = f"{model_path}/{model_name}"
-    checkpoint = torch.load(full_model_path, map_location=torch.device('cpu'))
-    model.load_state_dict(checkpoint['model_state_dict'])
-    print(f"Model loaded from {full_model_path}")
+def load_model(model, model_path, model_name="model"):
+    """
+    Loads the trained model and optimizer state from the specified path with the given model name.
+    """
+    model_load_path = f"{model_path}/{model_name}.pdparams"
+    
+    model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cpu')))
+    
+    print(f"Model loaded from {model_load_path}")
+
     return model
 
 def infer(model, text):
@@ -24,15 +29,33 @@ def infer(model, text):
 
 # Load dataset and prepare mappings
 root_path = './dataset/'
-train_set, test_set, word_dict, label_dict = load_dataset(root_path)
+word_dict, label_dict = load_dict(root_path)
 id2label = dict([(item[1], item[0]) for item in label_dict.items()])  # Map label IDs to label names
 
+vocab_size = len(word_dict.keys())
+hidden_size = 128
+embedding_size = 128
+n_classes = len(label_dict.keys())
+max_seq_len = 32
+n_layers = 1
+direction = 'bidirectional'
+dropout_rate = 0.2
+
+
 # Initialize and load the model
-model = Classifier()  # Replace with your actual model class
-model_path = "./model"  # Replace with the actual path to your model file
-model_name = "BilLSTM+AddictiveAttention.pdparams"  # Replace with your actual model name
+model = Classifier(
+        hidden_size=hidden_size,
+        embedding_size=embedding_size,
+        vocab_size=vocab_size,
+        n_classes=n_classes,
+        n_layers=n_layers,
+        direction=direction,
+        dropout_rate=dropout_rate
+    )  
+model_path = "./model"  
+model_name = "BilLSTM+AddictiveAttention"
 model = load_model(model, model_path, model_name)
 
 # Perform inference
-title = "我爱北京天安门"
+title = "云南发现恐龙新属种：金沙江元谋盗龙"
 infer(model, title)
