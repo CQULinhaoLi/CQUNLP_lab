@@ -25,7 +25,7 @@ def infer(model, text):
 
     max_label_id = torch.argmax(output, dim=1).item()
     predicted_label = id2label[max_label_id]
-    print("Label: ", predicted_label)
+    print("Predicted Label: ", predicted_label)
 
 # Load dataset and prepare mappings
 root_path = './dataset/'
@@ -57,5 +57,16 @@ model_name = "BilLSTM+AddictiveAttention"
 model = load_model(model, model_path, model_name)
 
 # Perform inference
-title = "云南发现恐龙新属种：金沙江元谋盗龙"
-infer(model, title)
+titles = [
+    # ("星座", "男生眼里最有魅力的星座女"),
+    # ("财经", "黄金未必比不动产更可靠"),
+    # ("游戏", "网游《三国战魂》今日时技术三测"),
+    # ("娱乐", "赵雅芝为肖像权讨万元，使用方称使用是因喜欢"),
+    # ("体育", "米体：琼托利开转会会议，尤文有意奥斯梅恩、托纳利&科穆佐"),
+    ("体育", "你还记得卡恩的这个骚操作吗？"),
+    ("娱乐", "霍思燕黑羽毛裙亮相，雪白肌肤成焦点"),
+]
+for title in titles:
+    print(f"Title: {title[1]}")
+    print(f"True label: {title[0]}")
+    infer(model, title[1])
