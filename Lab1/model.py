@@ -72,7 +72,8 @@ class Classifier(nn.Module):
         )
 
         self.dropout_emb = nn.Dropout(p=self.dropout_rate)  # 嵌入层的 Dropout
-
+        # 如果是双向 LSTM，hidden_size 需要乘以 2
+        # 因为双向 LSTM 会输出两个隐藏状态，一个正向一个反向，拼接在一起
         self.attention = AttentionLayer(self.hidden_size * 2 if direction == 'bidirectional' else self.hidden_size)  # 注意力层
         self.cls_fc = nn.Linear(in_features=self.hidden_size*2 if direction == 'bidirectional' else self.hidden_size, out_features=self.n_classes) # 分类全连接层
 
