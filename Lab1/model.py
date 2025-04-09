@@ -6,8 +6,8 @@ class AttentionLayer(nn.Module):
     def __init__(self, hidden_size):
         super(AttentionLayer, self).__init__()
         # 定义可学习的参数矩阵 w 和向量 v
-        self.w = nn.Parameter(torch.empty(hidden_size, hidden_size))  # 权重矩阵
-        self.v = nn.Parameter(torch.empty([1, hidden_size], dtype=torch.float32))  # 注意力向量
+        self.w = nn.Parameter(torch.empty(hidden_size, hidden_size))  # 权重矩阵 (相当于 Q 和 K 的映射矩阵)
+        self.v = nn.Parameter(torch.empty([1, hidden_size], dtype=torch.float32))  # 注意力向量 (相当于 V 的映射矩阵)
 
         # 初始化参数
         nn.init.xavier_uniform_(self.w)  # 使用 Xavier 初始化权重矩阵
@@ -28,10 +28,12 @@ class AttentionLayer(nn.Module):
         # 计算注意力得分
         # 通过 tanh 激活函数对输入进行非线性变换
         inputs = torch.tanh(torch.matmul(self.w, inputs))  # [batch_size, hidden_size, seq_len]
+        # 此处的 inputs 相当于 Q 和 K 的交互结果
 
         # 计算注意力权重
         # 将注意力向量与输入相乘并 squeeze 维度
         attn_weights = torch.matmul(self.v, inputs).squeeze(1)  # [batch_size, seq_len]
+        # 此处的 attn_weights 相当于 softmax(QK^T) 的结果
 
         # 对注意力权重进行 softmax 归一化
         attn_weights = F.softmax(attn_weights, dim=-1)  # [batch_size, seq_len]
@@ -40,9 +42,9 @@ class AttentionLayer(nn.Module):
         # 将注意力权重与原始输入加权求和
         attn_vectors = torch.matmul(attn_weights.unsqueeze(1), last_layers_hiddens)  # [batch_size, 1, hidden_size]
         attn_vectors = torch.squeeze(attn_vectors, dim=1)  # [batch_size, hidden_size]
+        # 此处的 attn_vectors 相当于加权后的 V
 
         return attn_vectors
-    
 class Classifier(nn.Module):
     def __init__(self, hidden_size, embedding_size, vocab_size, n_classes=14, n_layers=1, direction='bidirectional', dropout_rate=0., init_scale=0.05):
         super(Classifier, self).__init__()
