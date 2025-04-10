@@ -119,6 +119,7 @@ def train(model, train_set, word_dict, id2label, optimizer, n_epochs, batch_size
         # Print training metrics after each epoch
         result = metric.get_result()
         metric.format_print(result)
+        save_model(classifier, optimizer, './model/first', model_name=f'{epoch+1}_{CFG['parameters_version']}') 
 
 
 def show_loss_records():
