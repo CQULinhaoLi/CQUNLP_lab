@@ -9,54 +9,99 @@ from tokenizer import convert_corpus_to_id
 from mini_batch import split_data_set
 from model import Classifier
 from utils.config_loader import load_config
+
+
 class Metric:
     """
-    A utility class to calculate and track evaluation metrics (e.g., accuracy, precision, recall, F1 score).
+    支持多类分类的指标计算类，提供单类指标和宏平均结果
     """
     def __init__(self, id2label):
-        self.id2label = id2label
+        self.id2label = id2label  # 标签ID到名称的映射（如 {0: "cat", 1: "dog"}）
         self.reset()
-    
+
     def reset(self):
-        """
-        Resets the metric counters.
-        """
+        """按类别独立存储统计量"""
+        self.class_stats = {}  # 格式：{label_id: {"tp": 0, "fp": 0, "fn": 0, "tn": 0}}
         self.total_samples = 0
         self.correct_samples = 0
-        self.true_positives = 0
-        self.false_positives = 0
-        self.false_negatives = 0
 
     def update(self, real_labels, pred_labels):
         """
-        Updates the metric counters based on the real and predicted labels.
+        real_labels: 真实标签数组（如 [0, 1, 0]）
+        pred_labels: 预测标签数组（如 [0, 0, 1]）
         """
         self.total_samples += len(real_labels)
         self.correct_samples += np.sum(real_labels == pred_labels)
-        
-        for label in np.unique(real_labels):
-            self.true_positives += np.sum((real_labels == label) & (pred_labels == label))
-            self.false_positives += np.sum((real_labels != label) & (pred_labels == label))
-            self.false_negatives += np.sum((real_labels == label) & (pred_labels != label))
 
-    def get_result(self):
-        """
-        Calculates and returns the accuracy, precision, recall, and F1 score.
-        """
-        accuracy = self.correct_samples / self.total_samples
-        precision = self.true_positives / (self.true_positives + self.false_positives) if (self.true_positives + self.false_positives) > 0 else 0
-        recall = self.true_positives / (self.true_positives + self.false_negatives) if (self.true_positives + self.false_negatives) > 0 else 0
-        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1_score": f1_score}
-    
-    def format_print(self, result):
-        """
-        Prints the formatted evaluation results.
-        """
-        print(f"Accuracy: {result['accuracy']:.4f}")
-        print(f"Precision: {result['precision']:.4f}")
-        print(f"Recall: {result['recall']:.4f}")
-        print(f"F1 Score: {result['f1_score']:.4f}")
+        # 获取所有可能的标签（包括真实和预测中出现的标签）
+        all_labels = np.union1d(np.unique(real_labels), np.unique(pred_labels))
+
+        for label in all_labels:
+            # 初始化类别统计
+            if label not in self.class_stats:
+                self.class_stats[label] = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
+            
+            # 计算TP/FP/FN/TN
+            tp = np.sum((real_labels == label) & (pred_labels == label))
+            fp = np.sum((real_labels != label) & (pred_labels == label))
+            fn = np.sum((real_labels == label) & (pred_labels != label))
+            tn = np.sum((real_labels != label) & (pred_labels != label))
+
+            # 累加统计量
+            self.class_stats[label]["tp"] += tp
+            self.class_stats[label]["fp"] += fp
+            self.class_stats[label]["fn"] += fn
+            self.class_stats[label]["tn"] += tn
+
+    def get_class_result(self, label_id):
+        """获取单个类别的指标"""
+        if label_id not in self.class_stats:
+            return None
+        stats = self.class_stats[label_id]
+        tp, fp, fn = stats["tp"], stats["fp"], stats["fn"]
+        
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        return {
+            "label": self.id2label[label_id],
+            "precision": precision,
+            "recall": recall,
+            "f1": f1
+        }
+
+    def get_macro_result(self):
+        """获取宏平均指标（忽略无样本的类别）"""
+        valid_classes = [c for c in self.class_stats if self.class_stats[c]["tp"] + self.class_stats[c]["fn"] > 0]
+        if not valid_classes:
+            return {"precision": 0.0, "recall": 0.0, "f1": 0.0}
+        
+        precision = np.mean([self.get_class_result(c)["precision"] for c in valid_classes])
+        recall = np.mean([self.get_class_result(c)["recall"] for c in valid_classes])
+        f1 = np.mean([self.get_class_result(c)["f1"] for c in valid_classes])
+        return {
+            "macro_precision": precision,
+            "macro_recall": recall,
+            "macro_f1": f1
+        }
+
+    def get_accuracy(self):
+        """总体准确率"""
+        return self.correct_samples / self.total_samples if self.total_samples > 0 else 0.0
+
+    def format_print(self):
+        """格式化输出（含单类指标和宏平均）"""
+        print(f"{'Label':<10}{'Precision':<10}{'Recall':<10}{'F1':<10}")
+        print("-" * 45)
+        for label_id in self.class_stats:
+            res = self.get_class_result(label_id)
+            print(f"{res['label']:<10}{res['precision']:.4f}{res['recall']:.4f}{res['f1']:.4f}")
+        print("\nMacro Average:")
+        macro_res = self.get_macro_result()
+        print(f"Precision: {macro_res['macro_precision']:.4f}")
+        print(f"Recall: {macro_res['macro_recall']:.4f}")
+        print(f"F1: {macro_res['macro_f1']:.4f}")
+        print(f"\nOverall Accuracy: {self.get_accuracy():.4f}")
 
 
 def evaluate(model, test_set, word_dict, id2label, batch_size, max_seq_len, device):
