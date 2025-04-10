@@ -148,7 +148,7 @@ def save_model(model, optimizer, path, model_name="model"):
 
 if __name__ == '__main__':
     # Load dataset and preprocess
-    CFG = load_config()
+    CFG = load_config("configs/first.yaml")
     root_path = CFG['data']['data_dir']
     train_set, test_set, word_dict, label_dict = load_dataset(root_path)
     train_set = convert_corpus_to_id(train_set, word_dict, label_dict)
