@@ -95,7 +95,7 @@ class Metric:
         print("-" * 45)
         for label_id in self.class_stats:
             res = self.get_class_result(label_id)
-            print(f"{res['label']:<10} || {res['precision']:.4f} || {res['recall']:.4f}{res['f1']:.4f}")
+            print(f"{res['label']:<10} {res['precision']:.4f} || {res['recall']:.4f} || {res['f1']:.4f}")
         print("\nMacro Average:")
         macro_res = self.get_macro_result()
         print(f"Precision: {macro_res['macro_precision']:.4f}")
