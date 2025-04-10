@@ -192,6 +192,7 @@ if __name__ == '__main__':
     loss = nn.CrossEntropyLoss()
 
     # Start training
-    train(classifier)
+    train(classifier, train_set, word_dict, id2label, optimizer, n_epochs, batch_size, max_seq_len, device)  # Train the model
+    evaluate(classifier, test_set, word_dict, id2label, batch_size, max_seq_len, device)  # Evaluate the model
     show_loss_records()  # Show the loss records after training
-    save_model(classifier, optimizer, './model/', model_name='BilLSTM+MaskedAddictiveAttention')  # Save the trained model and optimizer state
+    # save_model(classifier, optimizer, './model/', model_name='BilLSTM+MaskedAddictiveAttention')  # Save the trained model and optimizer state
