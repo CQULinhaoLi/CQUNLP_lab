@@ -18,7 +18,7 @@ data:
 model:
   type: "BiLSTM"
   hidden_size: 512
-  embedding_size: 128
+  embedding_size: 256
   max_seq_len: 64
   n_classes: 14
   n_layers: 2
