@@ -2,6 +2,7 @@ import yaml
 import re
 from pathlib import Path
 from typing import Dict, Any
+import os
 
 def load_config(config_path: str = "configs/default.yaml") -> Dict[str, Any]:
     env_var_pattern = re.compile(r'\${env:(.*?)}')
