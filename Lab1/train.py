@@ -8,11 +8,10 @@ from data_loader import load_dataset
 from tokenizer import convert_corpus_to_id
 from mini_batch import split_data_set
 from model import Classifier
-
-
+from utils.config_loader import load_config
 class Metric:
     """
-    A utility class to calculate and track evaluation metrics (e.g., accuracy).
+    A utility class to calculate and track evaluation metrics (e.g., accuracy, precision, recall, F1 score).
     """
     def __init__(self, id2label):
         self.id2label = id2label
@@ -24,6 +23,9 @@ class Metric:
         """
         self.total_samples = 0
         self.correct_samples = 0
+        self.true_positives = 0
+        self.false_positives = 0
+        self.false_negatives = 0
 
     def update(self, real_labels, pred_labels):
         """
@@ -31,19 +33,30 @@ class Metric:
         """
         self.total_samples += len(real_labels)
         self.correct_samples += np.sum(real_labels == pred_labels)
+        
+        for label in np.unique(real_labels):
+            self.true_positives += np.sum((real_labels == label) & (pred_labels == label))
+            self.false_positives += np.sum((real_labels != label) & (pred_labels == label))
+            self.false_negatives += np.sum((real_labels == label) & (pred_labels != label))
 
     def get_result(self):
         """
-        Calculates and returns the accuracy.
+        Calculates and returns the accuracy, precision, recall, and F1 score.
         """
         accuracy = self.correct_samples / self.total_samples
-        return {"accuracy": accuracy}
+        precision = self.true_positives / (self.true_positives + self.false_positives) if (self.true_positives + self.false_positives) > 0 else 0
+        recall = self.true_positives / (self.true_positives + self.false_negatives) if (self.true_positives + self.false_negatives) > 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1_score": f1_score}
     
     def format_print(self, result):
         """
-        Prints the formatted accuracy result.
+        Prints the formatted evaluation results.
         """
         print(f"Accuracy: {result['accuracy']:.4f}")
+        print(f"Precision: {result['precision']:.4f}")
+        print(f"Recall: {result['recall']:.4f}")
+        print(f"F1 Score: {result['f1_score']:.4f}")
 
 
 def evaluate(model):
@@ -139,24 +152,25 @@ def save_model(model, optimizer, path, model_name="model"):
 
 if __name__ == '__main__':
     # Load dataset and preprocess
-    root_path = './dataset/'
+    CFG = load_config()
+    root_path = CFG['data']['data_dir']
     train_set, test_set, word_dict, label_dict = load_dataset(root_path)
     train_set = convert_corpus_to_id(train_set, word_dict, label_dict)
     test_set = convert_corpus_to_id(test_set, word_dict, label_dict)
     id2label = dict([(item[1], item[0]) for item in label_dict.items()])  # Map label IDs to label names
 
     # Hyperparameters
-    n_epochs = 15
+    n_epochs = CFG['training']['epochs']
     vocab_size = len(word_dict.keys())
-    batch_size = 256
-    hidden_size = 128
-    embedding_size = 128
+    batch_size = CFG['training']['batch_size']
+    hidden_size = CFG['model']['hidden_size']
+    embedding_size = CFG['model']['embedding_size']
     n_classes = len(label_dict.keys())
-    max_seq_len = 32
-    n_layers = 1
-    dropout_rate = 0.2
-    learning_rate = 0.001
-    direction = 'bidirectional'
+    max_seq_len = CFG['model']['max_seq_len']  # Maximum sequence length for padding
+    n_layers = CFG['model']['n_layers']
+    dropout_rate = CFG['model']['dropout_rate']
+    learning_rate = CFG['training']['learning_rate']
+    direction = CFG['model']['direction']  # 'bidirectional' or 'unidirectional'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use GPU if available
     print(f"Device: {device}")
 
@@ -175,9 +189,11 @@ if __name__ == '__main__':
     optimizer = optim.Adam(
         classifier.parameters(),
         lr=learning_rate,
-        betas=(0.9, 0.99),
-        weight_decay=1e-5
+        betas=CFG['training']['betas'],
+        weight_decay=CFG['training']['weight_decay'],
     )
+
+    loss = nn.CrossEntropyLoss()
 
     # Start training
     train(classifier)
