@@ -232,9 +232,6 @@ if __name__ == '__main__':
         betas=CFG['training']['betas'],
         weight_decay=CFG['training']['weight_decay'],
     )
-
-    loss = nn.CrossEntropyLoss()
-
     # Start training
     train(classifier, train_set, word_dict, id2label, optimizer, n_epochs, batch_size, max_seq_len, device)  # Train the model
     evaluate(classifier, test_set, word_dict, id2label, batch_size, max_seq_len, device)  # Evaluate the model
