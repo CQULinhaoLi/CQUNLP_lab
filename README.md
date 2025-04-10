@@ -23,15 +23,5 @@
 ```bash
 NLP-Experiments/
 │── Lab1/                    # 文本分类实验
-│    ├── data/              # 数据集
-│    ├── src/               # 实验代码
-│    └── README.md         # Lab1 实验说明
-│
-│── Lab2/                    # 命名实体识别实验
-│    ├── data/
-│    ├── src/
-│    └── README.md
-│
-│── requirements.txt         # 项目依赖
-│── inference.py             # 推理示例脚本
+│── requirements.txt         # 项目依赖          # 推理示例脚本
 └── README.md                # 总体项目说明
