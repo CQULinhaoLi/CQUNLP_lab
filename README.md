@@ -23,5 +23,5 @@
 ```bash
 NLP-Experiments/
 │── Lab1/                    # 文本分类实验
-│── requirements.txt         # 项目依赖          # 推理示例脚本
+│── requirements.txt         # 项目依赖
 └── README.md                # 总体项目说明
