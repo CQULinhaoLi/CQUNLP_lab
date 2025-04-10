@@ -59,7 +59,7 @@ class Metric:
         print(f"F1 Score: {result['f1_score']:.4f}")
 
 
-def evaluate(model):
+def evaluate(model, test_set, word_dict, id2label, batch_size, max_seq_len, device):
     """
     Evaluates the model on the test set and prints the accuracy.
     """
@@ -82,10 +82,9 @@ def evaluate(model):
     result = metric.get_result()
     metric.format_print(result)
 
-
 loss_records = []  # Global list to track loss values during training
 
-def train(model):
+def train(model, train_set, word_dict, id2label, optimizer, n_epochs, batch_size, max_seq_len, device):
     """
     Trains the model on the training set and evaluates it after each epoch.
     """
@@ -120,9 +119,6 @@ def train(model):
         # Print training metrics after each epoch
         result = metric.get_result()
         metric.format_print(result)
-
-        # Evaluate the model on the test set
-        evaluate(model)
 
 
 def show_loss_records():
