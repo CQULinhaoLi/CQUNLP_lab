@@ -10,10 +10,8 @@
   本仓库收集了我在 NLP 课程中完成的各个实验，旨在对比传统方法和深度学习方法在自然语言处理任务中的表现，探索不同算法的优缺点。
 
 - **主要内容**  
-  - 文本分类（Text Classification）
-  - 命名实体识别（Named Entity Recognition, NER）
-  - 语言模型（Language Modeling）
-  - 机器翻译（Machine Translation）
+  - Lab1: 新闻标题文本分类 (News Tiltles Classification)
+  - Lab2：电影评论情感分析 (Movie Comments Sentiment Analysis)
   - 更多实验…
 
 ---
@@ -23,5 +21,5 @@
 ```bash
 NLP-Experiments/
 │── Lab1/                    # 文本分类实验
-│── requirements.txt         # 项目依赖
+│── Lab2/                    # 项目依赖
 └── README.md                # 总体项目说明
