@@ -184,7 +184,7 @@ def get_data_loader(train_ids, train_labels, test_ids, test_labels, batch_size=C
         test_dataset,
         batch_size=batch_size,  # 每批次样本数量
         shuffle=False,  # 不打乱数据顺序
-        collate_fn=imdb_collate  # 使用动态填充的collate函数
+        collate_fn=_imdb_collate  # 使用动态填充的collate函数
     )
 
     return train_loader, test_loader  # 返回训练集和测试集的DataLoader

@@ -1,6 +1,5 @@
 from data_utils import load_imdb_data, tokenize_corpus, build_vocab, text_to_ids, get_data_loader
 import os
-from config import Config as CFG
 
 
 def preprocess_data():

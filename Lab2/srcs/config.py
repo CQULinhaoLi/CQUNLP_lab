@@ -25,7 +25,7 @@ class Config:
     max_len = 128  # padding 长度上限
 
     # ========= 模型与日志路径 =========
-    best_model_path = f"saved_models/best_RNN_model.pt"
+    best_model_path = "../saved_models/best_RNN_model.pt"
 
     # ========= 设备设置 =========
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

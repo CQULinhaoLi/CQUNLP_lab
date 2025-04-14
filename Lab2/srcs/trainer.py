@@ -13,7 +13,7 @@ class Trainer:
         self.device = cfg.device
         self.cfg = cfg
 
-        self.save_path = cfg.save_path
+        self.save_path = cfg.best_model_path
         self.use_early_stopping = getattr(cfg, 'use_early_stopping', True)
         self.early_stop_patience = getattr(cfg, 'early_stop_patience', 3)
 
