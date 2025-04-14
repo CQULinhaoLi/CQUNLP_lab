@@ -1,0 +1,49 @@
+# Default configuration file for the NLP project
+
+project:
+  name: "电影评论情感分析"
+  description: "Sentiment analysis of movie reviews using NLP techniques."
+  version: 1.0
+  author: "Klay"
+
+data:
+  data_dir: "./imdb_aclImdb_v1/aclImdb"
+  train_folder: "train"
+  test_floder: "test"
+  label_dict_name: "label_dict.txt"
+  validation_split: 0.2
+  
+
+model:
+  type: "BiLSTM"
+  hidden_size: 128
+  embedding_size: 128
+  max_seq_len: 128
+  n_classes: 14
+  n_layers: 1
+  dropout_rate: 0.2
+  direction: "bidirectional"
+
+training:
+  epochs: 4
+  batch_size: 64
+  learning_rate: 0.001
+  optimizer: "adam"
+  betas: [0.9, 0.99]
+  weight_decay: 0.0001
+  loss_function: "cross_entropy"
+
+# logging:
+#   log_dir: "./logs"
+#   log_level: "INFO"
+#   save_model: true
+#   save_model_path: "./models/best_model.pth"
+
+# evaluation:
+#   metrics:
+#     - "accuracy"
+#     - "f1_score"
+#     - "precision"
+#     - "recall"
+
+parameters_version: "default"
