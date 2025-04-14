@@ -153,7 +153,7 @@ def _imdb_collate(batch, pad_id=0):
     padded_seqs = torch.stack(padded_seqs)  # [B, L]
     labels = torch.LongTensor(labels)  # [B]
     
-    return padded_seqs, seq_lengths, labels  # 直接用于RNN的pack操作
+    return padded_seqs, labels, seq_lengths  # 直接用于RNN的pack操作
 
 def get_data_loader(train_ids, train_labels, test_ids, test_labels, batch_size=CFG.batch_size, pad_id=0):
     """

@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 
 
 class Trainer:
-    def __init__(self, model, optimizer, criterion, cfg):
-        self.model = model
+    def __init__(self, model, criterion, optimizer, cfg):
+        self.model = model.to(cfg.device)
+        self.criterion = criterion.to(cfg.device)
         self.optimizer = optimizer
-        self.criterion = criterion
         self.device = cfg.device
         self.cfg = cfg
 

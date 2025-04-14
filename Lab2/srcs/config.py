@@ -12,7 +12,7 @@ class Config:
     # ========= 训练超参数 =========
     batch_size = 128
     learning_rate = 1e-2
-    num_epochs = 5
+    num_epochs = 1
     early_stop_patience = 3
 
     # ========= 损失函数和优化器 =========
@@ -31,7 +31,7 @@ class Config:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ========= 可选开关 =========
-    first_run = False  # 是否第一次运行
-    use_attention = True  # 是否使用注意力机制 对应AttentionRNN/SimpleRNN
+    first_run = True  # 是否第一次运行
+    use_attention = True # 是否使用注意力机制 对应AttentionRNN/SimpleRNN
     visualize_attention = True  # 推理时是否可视化注意力
     use_early_stopping = True  # 是否使用早停
