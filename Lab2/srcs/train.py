@@ -39,5 +39,6 @@ def train_model(train_loader, test_loader, vocab_size, cfg):
     elif cfg.optimizer == "SGD":
         optimizer = torch.optim.SGD(model.parameters(), lr=cfg.learning_rate)
 
+    model = model.to(cfg.device)
     trainer = Trainer(model, criterion, optimizer, cfg)
     trainer.fit(train_loader, test_loader)
