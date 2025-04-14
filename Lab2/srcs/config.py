@@ -21,7 +21,7 @@ class Config:
 
 
     # ========= 数据参数 =========
-    min_freq = 5  # 构建词表时的最小词频
+    min_freq = 3  # 构建词表时的最小词频
     max_len = 128  # padding 长度上限
 
     # ========= 模型与日志路径 =========
@@ -31,6 +31,7 @@ class Config:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ========= 可选开关 =========
+    first_run = False  # 是否第一次运行
     use_attention = True  # 是否使用注意力机制 对应AttentionRNN/SimpleRNN
     visualize_attention = True  # 推理时是否可视化注意力
     use_early_stopping = True  # 是否使用早停

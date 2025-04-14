@@ -1,5 +1,6 @@
 from data_utils import load_imdb_data, tokenize_corpus, build_vocab, text_to_ids, get_data_loader
 import os
+from config import Config as CFG
 
 
 def preprocess_data():
@@ -14,7 +15,7 @@ def preprocess_data():
     tokenized_test_corpus = tokenize_corpus(test_corpus)
 
     # 3. 构建词表
-    vocab, word2idx, idx2word = build_vocab(tokenized_train_corpus, min_freq=5)
+    vocab, word2idx, idx2word = build_vocab(tokenized_train_corpus, min_freq=CFG.min_freq)
 
     # 4. 将文本转换为索引
     train_ids, train_labels = text_to_ids(tokenized_train_corpus, word2idx)
@@ -23,5 +24,5 @@ def preprocess_data():
     # 5. 创建数据集和数据加载器
     train_loader, test_loader = get_data_loader(train_ids, train_labels, test_ids, test_labels)
 
-
+    
     return train_loader, test_loader, vocab, word2idx, idx2word
