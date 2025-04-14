@@ -31,7 +31,7 @@ class Config:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ========= 可选开关 =========
-    first_run = True  # 是否第一次运行
+    first_run = True # 是否第一次运行
     use_attention = True # 是否使用注意力机制 对应AttentionRNN/SimpleRNN
     visualize_attention = True  # 推理时是否可视化注意力
     use_early_stopping = True  # 是否使用早停
