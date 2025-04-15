@@ -21,5 +21,5 @@
 ```bash
 NLP-Experiments/
 │── Lab1/                    # 文本分类实验
-│── Lab2/                    # 项目依赖
+│── Lab2/                    # 情感分析实验
 └── README.md                # 总体项目说明
