@@ -29,6 +29,8 @@ class Trainer:
             x, y, lengths = x.to(self.device), y.to(self.device), lengths.to(self.device)
             self.optimizer.zero_grad()
             outputs = self.model(x, lengths)
+            if isinstance(outputs, tuple):  # 兼容 AttentionRNN
+                outputs = outputs[0]
             loss = self.criterion(outputs, y)
             loss.backward()
             self.optimizer.step()
@@ -39,6 +41,7 @@ class Trainer:
             total += y.size(0)
         return epoch_loss / len(train_loader), correct / total
 
+
     def _evaluate(self, val_loader):
         self.model.eval()
         epoch_loss, correct, total = 0, 0, 0
@@ -46,6 +49,8 @@ class Trainer:
             for x, y, lengths in tqdm(val_loader, desc="Validating", leave=False):
                 x, y, lengths = x.to(self.device), y.to(self.device), lengths.to(self.device)
                 outputs = self.model(x, lengths)
+                if isinstance(outputs, tuple):  # 兼容 AttentionRNN
+                    outputs = outputs[0]
                 loss = self.criterion(outputs, y)
 
                 epoch_loss += loss.item()
