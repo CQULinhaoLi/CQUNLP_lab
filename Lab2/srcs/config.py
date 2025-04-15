@@ -12,7 +12,7 @@ class Config:
     # ========= 训练超参数 =========
     batch_size = 128
     learning_rate = 1e-2
-    num_epochs = 3
+    num_epochs = 1
     early_stop_patience = 3
 
     # ========= 损失函数和优化器 =========
@@ -25,7 +25,7 @@ class Config:
     max_len = 128  # padding 长度上限
 
     # ========= 模型与日志路径 =========
-    best_model_path = "../saved_models/best_RNN_model.pt"
+    best_model_path = "../saved_models/best_RNN_attention_model.pt"
 
     # ========= 设备设置 =========
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

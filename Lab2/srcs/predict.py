@@ -44,7 +44,10 @@ model.to(CFG.device)
 # 推理 + 可视化
 # 注意：这里的模型是经过训练的模型，推理时需要使用训练好的模型参数
 print('开始推理')
-sentence = "The movie was absolutely fantastic!"
-label, tokens, attn_weights = infer(model, sentence, word2idx, idx2word, CFG.device, max_len=CFG.max_len)
-print("Predicted label:", label)
-visualize_attention(tokens, attn_weights)
+sentence = "The movie was absolutely wonderful!"
+label, confidence, tokens, attn_weights = infer(model, sentence, word2idx, idx2word, CFG.device, max_len=CFG.max_len)
+print(f"Predicted label:{label}, Confidence:{confidence*100:.2f}%")
+print("Tokens:", tokens)
+if attn_weights is not None and CFG.visualize_attention:
+    print("Attention weights:", attn_weights)
+    visualize_attention(tokens, attn_weights)
