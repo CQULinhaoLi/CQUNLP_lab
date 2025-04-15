@@ -65,8 +65,8 @@ model.eval()
 print('开始推理')
 sentence = "This movie is an absolute gem! With a gripping plot that hooks you from the start and outstanding performances breathing life into every character, its top - notch production quality immerses you fully. A must - watch!"
 label, confidence, tokens, attn_weights = infer(model, sentence, word2idx, idx2word, CFG.device, max_len=CFG.max_len)
-
-print(f"Predicted label: {label}, Confidence: {confidence * 100:.2f}%")
+print(f"Sentence: {sentence}")
+print(f"Predicted label: {"pos" if label==1 else "neg"}, Confidence: {confidence * 100:.2f}%")
 print("Tokens:", tokens)
 
 if attn_weights is not None and CFG.visualize_attention:
