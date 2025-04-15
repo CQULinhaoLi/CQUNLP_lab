@@ -44,10 +44,6 @@ def train_model(train_loader, test_loader, vocab_size, cfg, model_save_path, con
     trainer = Trainer(model, criterion, optimizer, cfg, model_save_path)
     trainer.fit(train_loader, test_loader)
 
-    # 保存模型
-    torch.save(model.state_dict(), model_save_path)
-    print(f"模型已保存至: {model_save_path}")
-
     # 保存配置
     cfg.save_config(config_save_path)
     print(f"配置已保存至: {config_save_path}")
