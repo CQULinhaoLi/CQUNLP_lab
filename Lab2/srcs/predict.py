@@ -44,7 +44,7 @@ model.to(CFG.device)
 # 推理 + 可视化
 # 注意：这里的模型是经过训练的模型，推理时需要使用训练好的模型参数
 print('开始推理')
-sentence = "The movie was absolutely wonderful!"
+sentence = "This movie is an absolute gem! With a gripping plot that hooks you from the start and outstanding performances breathing life into every character, its top - notch production quality immerses you fully. A must - watch!"
 label, confidence, tokens, attn_weights = infer(model, sentence, word2idx, idx2word, CFG.device, max_len=CFG.max_len)
 print(f"Predicted label:{label}, Confidence:{confidence*100:.2f}%")
 print("Tokens:", tokens)
