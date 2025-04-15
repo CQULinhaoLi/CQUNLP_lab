@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, cfg):
+    def __init__(self, model, criterion, optimizer, cfg, model_save_path):
         self.model = model.to(cfg.device)
         self.criterion = criterion.to(cfg.device)
         self.optimizer = optimizer
         self.device = cfg.device
         self.cfg = cfg
 
-        self.save_path = cfg.best_model_path
+        self.save_path = model_save_path
         self.use_early_stopping = getattr(cfg, 'use_early_stopping', True)
         self.early_stop_patience = getattr(cfg, 'early_stop_patience', 3)
 

@@ -2,12 +2,14 @@ from trainer import Trainer
 
 
 import torch
-
-def train_model(train_loader, test_loader, vocab_size, cfg):
+# 训练模型函数修改：
+def train_model(train_loader, test_loader, vocab_size, cfg, model_save_path, config_save_path):
     """
     训练模型
     :param train_loader: 训练集数据加载器
     :param test_loader: 测试集数据加载器
+    :param model_save_path: 模型保存路径
+    :param config_save_path: 配置保存路径
     """
 
     if cfg.use_attention:
@@ -39,5 +41,13 @@ def train_model(train_loader, test_loader, vocab_size, cfg):
     elif cfg.optimizer == "SGD":
         optimizer = torch.optim.SGD(model.parameters(), lr=cfg.learning_rate)
 
-    trainer = Trainer(model, criterion, optimizer, cfg)
+    trainer = Trainer(model, criterion, optimizer, cfg, model_save_path)
     trainer.fit(train_loader, test_loader)
+
+    # 保存模型
+    torch.save(model.state_dict(), model_save_path)
+    print(f"模型已保存至: {model_save_path}")
+
+    # 保存配置
+    cfg.save_config(config_save_path)
+    print(f"配置已保存至: {config_save_path}")

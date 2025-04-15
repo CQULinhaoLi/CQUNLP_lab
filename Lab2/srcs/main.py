@@ -6,6 +6,7 @@ from preprocess import preprocess_data
 from config import Config as CFG
 from train import train_model
 import pickle
+import time
 # 读取并处理数据
 print("加载数据集")
 # 如果是第一次运行，则重新处理数据，否则从保存文件加载
@@ -26,8 +27,12 @@ vocab_size = len(vocab)
 
 # 训练
 print("开始训练")
+# 生成带时间戳的文件名
+timestamp = time.strftime("%Y%m%d-%H%M%S")
+model_save_path = f"../saved_models/model_{timestamp}.pt"
+config_save_path = f"../saved_models/config_{timestamp}.json"
 # print("模型参数：", CFG.__dict__)
-train_model(train_loader, test_loader, vocab_size, CFG)
+train_model(train_loader, test_loader, vocab_size, CFG, model_save_path, config_save_path)
 
 
 # # 加载模型
